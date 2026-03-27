@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Yêu Cầu | QLCV Y Khoa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hospital-user"></i>
+                    <span>QLCV Y Khoa</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Chính</div>
+                    <a href="dashboard-staff.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Bảng điều khiển</span>
+                    </a>
+                    <a href="tickets-list.html" class="nav-item active">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Phiếu yêu cầu</span>
+                        <span class="badge">5</span>
+                    </a>
+                    <a href="tasks-list.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Công việc của tôi</span>
+                        <span class="badge">8</span>
+                    </a>
+                    <a href="task-pool.html" class="nav-item">
+                        <i class="fas fa-swimming-pool"></i>
+                        <span>Công việc chờ nhận</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Công việc</div>
+                    <a href="history.html" class="nav-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Lịch sử</span>
+                    </a>
+                    <a href="statistics.html" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thống kê</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">ĐBL</div>
+                    <div class="user-info">
+                        <div class="user-name">Đinh Bộ Lĩnh</div>
+                        <div class="user-role">Nhân viên</div>
+                    </div>
+                    <a href="login.html" style="color: var(--gray-500); margin-left: auto;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-ticket-alt"></i> Quản Lý Phiếu Yêu Cầu
+                    </h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm ticket theo mã, tiêu đề...">
+                    </div>
+                    <button class="icon-button">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">5</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Quick Stats -->
+                <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1.5rem;">
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-xl); box-shadow: var(--shadow); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem;">Tất cả</div>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: var(--dark);">48</div>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-xl); box-shadow: var(--shadow); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem;">Submitted</div>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary-color);">8</div>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-xl); box-shadow: var(--shadow); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem;">In Progress</div>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: var(--warning);">15</div>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-xl); box-shadow: var(--shadow); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem;">ĐÃ XỬ LÝ</div>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: var(--success);">20</div>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-xl); box-shadow: var(--shadow); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem;">Closed</div>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: var(--gray-600);">5</div>
+                    </div>
+                </div>
+
+                <!-- Filters & Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                            <h3 class="card-title">Danh Sách Phiếu Yêu Cầu</h3>
+                            <select class="form-select" style="width: auto; padding: 0.5rem;">
+                                <option>Phiếu của tôi</option>
+                                <option>Tất cả phiếu</option>
+                                <option>Phiếu nhóm</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <select class="form-select" style="width: 140px; padding: 0.5rem;">
+                                <option>Tất cả ưu tiên</option>
+                                <option>Khẩn cấp</option>
+                                <option>Cao</option>
+                                <option>Trung bình</option>
+                                <option>Thấp</option>
+                            </select>
+                            <select class="form-select" style="width: 160px; padding: 0.5rem;">
+                                <option>Tất cả trạng thái</option>
+                                <option>MỚI TẠO</option>
+                                <option>ĐANG XEM XÉT</option>
+                                <option>Đã phân công</option>
+                                <option>Đang xử lý</option>
+                                <option>ĐÃ XỬ LÝ</option>
+                                <option>CLOSED</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="openCreateTicketForm()">
+                                <i class="fas fa-plus"></i> Tạo Ticket Mới
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Mã Ticket</th>
+                                    <th>Tiêu đề</th>
+                                    <th style="width: 120px;">Phòng/Ban</th>
+                                    <th style="width: 110px;">Ưu tiên</th>
+                                    <th style="width: 140px;">Trạng thái SLA</th>
+                                    <th style="width: 140px;">Người xử lý</th>
+                                    <th style="width: 130px;">Trạng thái</th>
+                                    <th style="width: 100px;">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-001</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Sửa máy in tại phòng Cấp cứu</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Nguyễn Văn A • 
+                                            <i class="fas fa-clock"></i> 2h trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Kỹ thuật</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-exclamation-circle"></i> Khẩn cấp
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-danger">
+                                            <i class="fas fa-circle"></i> 15 phút
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;">ĐBL</div>
+                                            <div style="font-size: 0.813rem;">Đinh Bộ Lĩnh</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-warning">ĐANG XỬ LÝ</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-002</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Cài đặt phần mềm cho máy mới</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Trần Thị B • 
+                                            <i class="fas fa-clock"></i> 4h trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Hỗ trợ IT</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-exclamation"></i> Cao
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-warning">
+                                            <i class="fas fa-circle"></i> 2h 15m
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;">NVA</div>
+                                            <div style="font-size: 0.813rem;">Nguyễn Văn A</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-primary">ĐANG XỬ LÝ</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-003</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Kiểm tra thiết bị y tế tại Khoa Nội</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Lê Văn C • 
+                                            <i class="fas fa-clock"></i> 1 ngày trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Bảo trì</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: var(--warning-light); color: #92400e;">
+                                            <i class="fas fa-minus"></i> Trung bình
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-safe">
+                                            <i class="fas fa-circle"></i> 18h
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;">ĐBL</div>
+                                            <div style="font-size: 0.813rem;">Đinh Bộ Lĩnh</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">ĐÃ PHÂN CÔNG</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-004</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Sửa chữa điều hòa phòng họp</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Phạm Thị D • 
+                                            <i class="fas fa-clock"></i> 2 ngày trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Cơ sở</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: var(--success-light); color: #065f46;">
+                                            <i class="fas fa-arrow-down"></i> Thấp
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-safe">
+                                            <i class="fas fa-circle"></i> 2 ngày
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #3b82f6); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;">LVC</div>
+                                            <div style="font-size: 0.813rem;">Lê Văn C</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">ĐÃ XỬ LÝ</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Rating">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-005</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Hỗ trợ kết nối mạng</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Hoàng Văn E • 
+                                            <i class="fas fa-clock"></i> 3 giờ trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Mạng</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: var(--warning-light); color: #92400e;">
+                                            <i class="fas fa-minus"></i> Trung bình
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-safe">
+                                            <i class="fas fa-circle"></i> 20h
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 0.813rem; color: var(--gray-500);">
+                                            <i class="fas fa-clock"></i> Chưa phân công
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-primary">ĐANG XEM XÉT</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Assign">
+                                                <i class="fas fa-user-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;" onclick="window.location.href='ticket-detail.html'">
+                                    <td><strong>TKT-006</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600;">Yêu cầu thông tin về quy trình</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                            <i class="fas fa-user"></i> Đỗ Thị F • 
+                                            <i class="fas fa-clock"></i> 30 phút trước
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">Hành chính</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: var(--success-light); color: #065f46;">
+                                            <i class="fas fa-arrow-down"></i> Thấp
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="sla-badge sla-safe">
+                                            <i class="fas fa-circle"></i> 3 ngày
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 0.813rem; color: var(--gray-500);">
+                                            <i class="fas fa-clock"></i> Chưa phân công
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray">MỚI TẠO</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.25rem;">
+                                            <button class="icon-button" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="icon-button" title="Triage">
+                                                <i class="fas fa-filter"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                Hiển thị 1-6 trong 48 tickets
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; margin-left: auto;">
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-left"></i> Trước
+                                </button>
+                                <button class="btn btn-sm btn-primary">1</button>
+                                <button class="btn btn-sm btn-secondary">2</button>
+                                <button class="btn btn-sm btn-secondary">3</button>
+                                <button class="btn btn-sm btn-secondary">
+                                    Sau <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Slide-out Form Create Ticket -->
+    <div id="createTicketSlideout" class="slideout-panel">
+        <div class="slideout-header">
+            <h2>
+                <i class="fas fa-plus-circle"></i>
+                Tạo Ticket Mới
+            </h2>
+            <button class="slideout-close" onclick="closeCreateTicketForm()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="slideout-body">
+            <form id="createTicketForm">
+                <div class="form-group">
+                    <label>Tiêu đề <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Nhập tiêu đề ticket" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mô tả chi tiết <span class="required">*</span></label>
+                    <textarea class="form-control" rows="4" placeholder="Mô tả chi tiết vấn đề cần hỗ trợ..." required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mức độ ưu tiên <span class="required">*</span></label>
+                        <select class="form-control" required>
+                            <option value="">Chọn mức độ</option>
+                            <option value="critical">🔴 Khẩn cấp</option>
+                            <option value="high">🟠 Cao</option>
+                            <option value="medium" selected>🟡 Trung bình</option>
+                            <option value="low">🟢 Thấp</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại sự cố <span class="required">*</span></label>
+                        <select class="form-control" required>
+                            <option value="">Chọn loại</option>
+                            <option value="system">Sự cố hệ thống</option>
+                            <option value="support">Yêu cầu hỗ trợ</option>
+                            <option value="maintenance">Bảo trì</option>
+                            <option value="other">Khác</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phòng/Ban</label>
+                        <select class="form-control">
+                            <option value="">Chọn phòng ban</option>
+                            <option value="it">Hỗ trợ IT</option>
+                            <option value="medical">Y tế</option>
+                            <option value="facility">Cơ sở</option>
+                            <option value="admin">Hành chính</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vị trí/Địa điểm</label>
+                        <input type="text" class="form-control" placeholder="Vd: Phòng 301, Tầng 3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Đính kèm file</label>
+                    <div class="file-upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Kéo thả file vào đây hoặc <span class="upload-link">chọn file</span></p>
+                        <input type="file" id="ticketFileUpload" multiple style="display: none;">
+                    </div>
+                    <div id="ticketFileList" class="file-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox">
+                        <span>Gửi thông báo khẩn cấp</span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="slideout-footer">
+            <button class="btn btn-secondary" onclick="closeCreateTicketForm()">
+                <i class="fas fa-times"></i>
+                Hủy
+            </button>
+            <button class="btn btn-primary" onclick="submitCreateTicket()">
+                <i class="fas fa-paper-plane"></i>
+                Gửi Ticket
+            </button>
+        </div>
+    </div>
+    <div id="slideoutOverlay" class="slideout-overlay" onclick="closeCreateTicketForm()"></div>
+
+    <style>
+        /* Ticket Form Custom Styles */
+        .slideout-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        .slideout-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .slideout-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .required {
+            color: var(--danger-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .file-upload-area i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-link {
+            color: var(--primary-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+        }
+    </style>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"name": "Đinh Bộ Lĩnh", "role": "staff"}');
+        document.querySelector('.user-name').textContent = currentUser.name;
+
+        function openCreateTicketForm() {
+            document.getElementById('createTicketSlideout').classList.add('open');
+            document.getElementById('slideoutOverlay').classList.add('open');
+        }
+
+        function closeCreateTicketForm() {
+            document.getElementById('createTicketSlideout').classList.remove('open');
+            document.getElementById('slideoutOverlay').classList.remove('open');
+        }
+
+        function submitCreateTicket() {
+            const form = document.getElementById('createTicketForm');
+            if (form.checkValidity()) {
+                alert('Ticket đã được tạo thành công!\nMã ticket: TKT-' + Math.floor(Math.random() * 1000));
+                form.reset();
+                closeCreateTicketForm();
+            } else {
+                form.reportValidity();
+            }
+        }
+
+        // File upload handling
+        document.querySelector('.file-upload-area').addEventListener('click', function() {
+            document.getElementById('ticketFileUpload').click();
+        });
+
+        document.getElementById('ticketFileUpload').addEventListener('change', function(e) {
+            const fileList = document.getElementById('ticketFileList');
+            fileList.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.style.cssText = 'padding: 0.5rem; background: var(--gray-50); border-radius: 4px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;';
+                fileItem.innerHTML = `
+                    <span><i class="fas fa-file"></i> ${file.name}</span>
+                    <button type="button" style="background: none; border: none; color: var(--danger-color); cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCreateTicketForm();
+            }
+        });
+    </script>
+</body>
+</html>

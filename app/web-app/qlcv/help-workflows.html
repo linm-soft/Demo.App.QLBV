@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflows - QLCV Y Khoa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        .workflow-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        .workflow-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .workflow-tab:hover {
+            color: var(--primary-color);
+            background: var(--gray-50);
+        }
+        
+        .workflow-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .workflow-content {
+            display: block;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .workflow-content.active {
+            visibility: visible;
+            height: auto;
+            overflow: visible;
+        }
+        
+        .workflow-diagram {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+        
+        .workflow-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+        }
+        
+        .workflow-table th {
+            background: var(--gray-100);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--gray-300);
+        }
+        
+        .workflow-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: top;
+        }
+        
+        .workflow-table tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.125rem;
+        }
+        
+        .role-admin { background: #fee2e2; color: #991b1b; }
+        .role-manager { background: #fed7aa; color: #9a3412; }
+        .role-lead { background: #bfdbfe; color: #1e40af; }
+        .role-staff { background: #d1fae5; color: #065f46; }
+        .role-user { background: #e5e7eb; color: #374151; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.375rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Zoom controls */
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .zoom-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.2s;
+        }
+        
+        .zoom-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        
+        .zoom-btn:active {
+            transform: translateY(0);
+        }
+        
+        .zoom-btn.reset {
+            background: var(--gray-500);
+        }
+        
+        .zoom-btn.reset:hover {
+            background: var(--gray-600);
+        }
+        
+        .diagram-container {
+            transform-origin: center top;
+            transition: transform 0.3s ease;
+        }
+        
+        .zoom-level {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hospital-user"></i>
+                    <span>QLCV Y Khoa</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu chính</div>
+                    <a href="dashboard-staff.html" class="nav-item">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Bảng điều khiển</span>
+                    </a>
+                    <a href="tickets-list.html" class="nav-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Phiếu yêu cầu</span>
+                    </a>
+                    <a href="tasks-list.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Công việc của tôi</span>
+                    </a>
+                    <a href="task-pool.html" class="nav-item">
+                        <i class="fas fa-swimming-pool"></i>
+                        <span>Công việc chờ nhận</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Khác</div>
+                    <a href="settings.html" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài đặt</span>
+                    </a>
+                    <a href="help.html" class="nav-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Trợ giúp</span>
+                    </a>
+                    <a href="help-workflows.html" class="nav-item active">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Quy trình làm việc</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">NVA</div>
+                    <div class="user-info">
+                        <div class="user-name">Nguyễn Văn A</div>
+                        <div class="user-role">Nhân viên</div>
+                    </div>
+                </div>
+                <div class="logout-btn">
+                    <a href="login.html" style="color: var(--gray-500); margin-left: auto;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="page-title">
+                    <h1>
+                        <i class="fas fa-project-diagram"></i>
+                        Quy Trình Làm Việc
+                    </h1>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.25rem;">Hiểu rõ quy trình xử lý công việc và phân quyền</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="help.html" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                        <i class="fas fa-arrow-left"></i> Về Trợ giúp
+                    </a>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                
+                <!-- Overview -->
+                <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, var(--primary-light) 0%, var(--info-light) 100%);">
+                    <div style="padding: 1rem;">
+                        <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                            <i class="fas fa-info-circle"></i>
+                            Giới thiệu
+                        </h2>
+                        <p style="color: var(--gray-700); line-height: 1.6;">
+                            Hệ thống QLCV Y Khoa có <strong>2 quy trình làm việc chính</strong>:
+                        </p>
+                        <ol style="color: var(--gray-700); line-height: 1.8; padding-left: 1.5rem; margin-top: 1rem;">
+                            <li><strong>Support Ticket Management</strong> - Quản lý yêu cầu hỗ trợ từ người dùng</li>
+                            <li><strong>Task Assignment & Management</strong> - Giao việc và theo dõi tiến độ công việc</li>
+                        </ol>
+                        <p style="color: var(--gray-600); margin-top: 1rem; font-size: 0.875rem;">
+                            ℹ️ Mỗi quy trình có các bước rõ ràng, phân quyền chi tiết và SLA tracking tự động.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Workflow Tabs -->
+                <div class="card">
+                    <div class="workflow-tabs">
+                        <button class="workflow-tab active" onclick="showWorkflow(0)">
+                            <i class="fas fa-ticket-alt"></i>
+                            Support Ticket Workflow
+                        </button>
+                        <button class="workflow-tab" onclick="showWorkflow(1)">
+                            <i class="fas fa-tasks"></i>
+                            Task Management Workflow
+                        </button>
+                    </div>
+
+                    <!-- Workflow 1: Support Tickets -->
+                    <div id="workflow-0" class="workflow-content active">
+                        <h2 style="margin-bottom: 1rem;">
+                            <i class="fas fa-ticket-alt" style="color: var(--primary-color);"></i>
+                            Workflow 1: Support Ticket Management
+                        </h2>
+                        <p style="color: var(--gray-600); margin-bottom: 2rem;">
+                            Quy trình xử lý yêu cầu hỗ trợ từ khi tạo đến khi hoàn thành và đánh giá.
+                        </p>
+
+                        <!-- Department Assignment Note -->
+                        <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196f3; margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.75rem; color: #1565c0;">
+                                <i class="fas fa-hospital"></i> Mô hình Khoa/Phòng
+                            </h4>
+                            <p style="color: #424242; line-height: 1.6; margin: 0;">
+                                • <strong>Mỗi User được gán với 1 Khoa/Phòng cụ thể</strong> (vì đây là task nội bộ)<br>
+                                • <strong>Mỗi Khoa/Phòng có 1 Staff chuyên trách</strong> hỗ trợ và xử lý toàn bộ ticket của khoa/phòng đó<br>
+                                • Ticket tự động được route đến Staff chuyên trách của Khoa/Phòng tạo ticket<br>
+                                • Nếu Staff chuyên trách quá tải, Manager có thể reassign hoặc gán thêm helper
+                            </p>
+                        </div>
+
+                        <!-- Diagram -->
+                        <div class="workflow-diagram">
+                            <h3 style="margin-bottom: 1rem; text-align: center; color: var(--gray-700);">Sơ đồ quy trình</h3>
+                            
+                            <!-- Zoom Controls -->
+                            <div class="zoom-controls">
+                                <button class="zoom-btn" onclick="zoomDiagram('diagram-0', 'in')" title="Phóng to">
+                                    <i class="fas fa-search-plus"></i> Zoom In
+                                </button>
+                                <div class="zoom-level" id="zoom-level-0">100%</div>
+                                <button class="zoom-btn" onclick="zoomDiagram('diagram-0', 'out')" title="Thu nhỏ">
+                                    <i class="fas fa-search-minus"></i> Zoom Out
+                                </button>
+                                <button class="zoom-btn reset" onclick="zoomDiagram('diagram-0', 'reset')" title="Đặt lại">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                            </div>
+                            
+                            <div class="diagram-container" id="diagram-0">
+                                <div class="mermaid">
+flowchart LR
+    A["User Create Ticket<br/>(User - Khoa X)"] --> B["SUBMITTED<br/>(System detect dept)"]
+    B --> C{"{Auto-Route}<br/>(System)"}
+    C -->|"Route to Dept Staff"| G["ASSIGNED<br/>(Staff chuyen trach Khoa X)"]
+    C -->|"Need Triage"| T{"{Triage}<br/>(Manager)"}
+    T -->|Accept| G
+    T -->|Pending| E["PENDING<br/>(Need info)"]
+    T -->|Reject| F[REJECTED]
+    E -->|"Info Added<br/>(User)"| T
+    
+    G --> H["IN_PROGRESS<br/>(Staff)"]
+    H -->|"Request Help"| R["HELP_REQUESTED<br/>(Staff)"]
+    R -->|"Manager approve"| S["SUPPORT_ASSIGNED<br/>(+Helper from same dept)"]
+    S --> H
+    H -->|Complete| I["RESOLVED<br/>(Staff)"]
+    H -->|Issue| J["BLOCKED<br/>(Staff)"]
+    J -->|"Fixed<br/>(Manager/Dept Lead)"| H
+    I --> K{"{Review}<br/>(Manager/User)"}
+    K -->|Approve| L[APPROVED]
+    K -->|Reopen| H
+    L --> M["Rating<br/>(User)"]
+    M --> N["CLOSED<br/>(System)"]
+    
+    style A fill:#e3f2fd
+    style B fill:#fff9c4
+    style G fill:#c8e6c9
+    style H fill:#ffe082
+    style R fill:#fff3cd
+    style S fill:#d1ecf1
+    style I fill:#a5d6a7
+    style N fill:#66bb6a
+    style F fill:#ef9a9a
+    style J fill:#ffab91
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Steps Table -->
+                        <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Chi tiết các bước và phân quyền</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="workflow-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">Bước</th>
+                                        <th style="width: 15%;">Tên bước</th>
+                                        <th style="width: 15%;">Roles</th>
+                                        <th style="width: 35%;">Hành động</th>
+                                        <th style="width: 15%;">Trạng thái</th>
+                                        <th style="width: 15%;">SLA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>1</strong></td>
+                                        <td><strong>Ticket Creation</strong></td>
+                                        <td>
+                                            <span class="role-badge role-user">End User</span>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Tạo ticket mới<br>
+                                            • Nhập tiêu đề, mô tả<br>
+                                            • Chọn priority & category<br>
+                                            • Upload file đính kèm
+                                        </td>
+                                        <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">SUBMITTED</span></td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2</strong></td>
+                                        <td><strong>Auto-Routing</strong></td>
+                                        <td>
+                                            <span class="role-badge" style="background: #f3e5f5; color: #4a148c;">System</span>
+                                        </td>
+                                        <td>
+                                            • System tự động detect Khoa/Phòng của User<br>
+                                            • <strong>Tự động gán cho Staff chuyên trách</strong> của Khoa/Phòng đó<br>
+                                            • Gửi notification cho Staff<br>
+                                            • Nếu priority Critical/High: notify Manager đồng thời
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span>
+                                        </td>
+                                        <td>
+                                            <strong>Auto-assign:</strong><br>
+                                            • Ngay lập tức<br>
+                                            • Theo khoa/phòng<br>
+                                            • Staff chuyên trách
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2a</strong></td>
+                                        <td><strong>Manual Triage (Optional)</strong></td>
+                                        <td>
+                                            <span class="role-badge role-admin">Admin</span>
+                                            <span class="role-badge role-manager">Manager</span>
+                                        </td>
+                                        <td>
+                                            • <strong>Chỉ khi cần thiết:</strong> Manager can thiệp thủ công<br>
+                                            • Xem xét và đánh giá ticket<br>
+                                            • Quyết định: Accept/Pending/Reject<br>
+                                            • Nếu Pending: yêu cầu thêm thông tin<br>
+                                            • Nếu Reject: đóng với lý do<br>
+                                            • Reassign sang Staff khác nếu cần
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #dbeafe; color: #1e40af;">TRIAGED</span> /
+                                            <span class="status-badge" style="background: #fef3c7; color: #92400e;">PENDING</span> /
+                                            <span class="status-badge" style="background: #fee2e2; color: #991b1b;">REJECTED</span>
+                                        </td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>3</strong></td>
+                                        <td><strong>Staff Assignment Confirmed</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff chuyên trách</span>
+                                        </td>
+                                        <td>
+                                            • Staff chuyên trách của Khoa/Phòng nhận ticket<br>
+                                            • Xác nhận đã thấy và sẽ xử lý<br>
+                                            • Nếu quá tải: báo Manager để reassign hoặc request support
+                                        </td>
+                                        <td><span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span></td>
+                                        <td>
+                                            <strong>Response:</strong><br>
+                                            • Critical: 5 phút<br>
+                                            • High: 30 phút<br>
+                                            • Medium: 2 giờ<br>
+                                            • Low: 8 giờ
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4</strong></td>
+                                        <td><strong>Work in Progress</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Nhận và bắt đầu xử lý<br>
+                                            • Cập nhật tiến độ liên tục<br>
+                                            • Chat/comment trao đổi<br>
+                                            • Upload kết quả/hình ảnh<br>
+                                            • <strong>Request hỗ trợ</strong> nếu task khó/cần thêm người<br>
+                                            • Nếu blocked: báo manager
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #fef3c7; color: #92400e;">IN_PROGRESS</span> /
+                                            <span class="status-badge" style="background: #fff3cd; color: #856404;">HELP_REQUESTED</span> /
+                                            <span class="status-badge" style="background: #fed7aa; color: #9a3412;">BLOCKED</span>
+                                        </td>
+                                        <td>
+                                            <strong>Resolve:</strong><br>
+                                            • Critical: 2 giờ<br>
+                                            • High: 4 giờ<br>
+                                            • Medium: 24 giờ<br>
+                                            • Low: 3 ngày
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4a</strong></td>
+                                        <td><strong>Request Support</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                            <span class="role-badge role-manager">Manager</span>
+                                        </td>
+                                        <td>
+                                            • Staff yêu cầu hỗ trợ (task quá khó hoặc cần collaboration)<br>
+                                            • Nhập lý do cần support<br>
+                                            • Manager/Department Lead review và approve<br>
+                                            • <strong>Ưu tiên gán Helper từ cùng Khoa/Phòng</strong><br>
+                                            • Nếu không có sẵn: gán từ khoa/phòng khác<br>
+                                            • Task chuyển thành collaborative task
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #d1ecf1; color: #0c5460;">SUPPORT_ASSIGNED</span>
+                                        </td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5</strong></td>
+                                        <td><strong>Resolution</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Hoàn thành xử lý<br>
+                                            • Mô tả giải pháp đã áp dụng<br>
+                                            • Đánh dấu resolved<br>
+                                            • Thông báo user/manager
+                                        </td>
+                                        <td><span class="status-badge" style="background: #a5d6a7; color: #1b5e20;">RESOLVED</span></td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>6</strong></td>
+                                        <td><strong>Review & Approval</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                            <span class="role-badge role-user">End User</span>
+                                        </td>
+                                        <td>
+                                            • Xác nhận kết quả xử lý<br>
+                                            • Quyết định: Approve hoặc Reopen<br>
+                                            • Nếu Approved: User đánh giá 1-5 sao<br>
+                                            • Nếu Reopen: quay lại bước 4
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #81c784; color: #1b5e20;">APPROVED</span> /
+                                            <span class="status-badge" style="background: #ffab91; color: #bf360c;">REOPENED</span>
+                                        </td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>7</strong></td>
+                                        <td><strong>Closure</strong></td>
+                                        <td>
+                                            <span class="role-badge" style="background: #f3e5f5; color: #4a148c;">System</span>
+                                        </td>
+                                        <td>
+                                            • Tự động đóng ticket<br>
+                                            • Lưu vào lịch sử<br>
+                                            • Cập nhật KPI và reports
+                                        </td>
+                                        <td><span class="status-badge" style="background: #66bb6a; color: #fff;">CLOSED</span></td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Escalation Rules -->
+                        <div style="background: #fef3c7; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 2rem;">
+                            <h4 style="margin-bottom: 1rem; color: #92400e;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Quy tắc Escalation (Báo động tự động)
+                            </h4>
+                            <table class="workflow-table" style="background: white; margin: 0;">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Response Time</th>
+                                        <th>Resolve Time</th>
+                                        <th>Action khi vi phạm SLA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="status-badge" style="background: #fee2e2; color: #991b1b;">CRITICAL</span></td>
+                                        <td>5 phút</td>
+                                        <td>2 giờ</td>
+                                        <td>
+                                            • SMS/Call alert Manager ngay<br>
+                                            • Sau 2h: Alert Manager + Director<br>
+                                            • Đề xuất reassignment (cần approval)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="status-badge" style="background: #fed7aa; color: #9a3412;">HIGH</span></td>
+                                        <td>30 phút</td>
+                                        <td>4 giờ</td>
+                                        <td>
+                                            • Email alert Team Lead sau 30 phút<br>
+                                            • Sau 4h: Alert Manager + Đề xuất reassignment
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">MEDIUM</span></td>
+                                        <td>2 giờ</td>
+                                        <td>24 giờ</td>
+                                        <td>
+                                            • Notification Manager sau 2h<br>
+                                            • Sau 24h: Manager review required
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="status-badge" style="background: #bbdefb; color: #0d47a1;">LOW</span></td>
+                                        <td>8 giờ</td>
+                                        <td>3 ngày</td>
+                                        <td>
+                                            • Email reminder sau 8h<br>
+                                            • Sau 3 ngày: Escalate lên Manager
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p style="margin-top: 1rem; color: #92400e; font-size: 0.875rem;">
+                                ⚠️ <strong>Lưu ý quan trọng:</strong> System KHÔNG BAO GIỜ tự động reassign. Chỉ đề xuất và cần Manager approval.
+                            </p>
+                        </div>
+
+                        <!-- Roles Matrix -->
+                        <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Ma trận phân quyền</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="workflow-table">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Creation</th>
+                                        <th>Triage</th>
+                                        <th>Assignment</th>
+                                        <th>Work</th>
+                                        <th>Resolution</th>
+                                        <th>Review</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="role-badge role-user">End User</span></td>
+                                        <td>✅ Tạo ticket<br>✅ Cung cấp thông tin</td>
+                                        <td>⚠️ Cung cấp thêm info nếu cần</td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>✅ Review kết quả<br>✅ Đánh giá chất lượng</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-staff">Staff (chuyên trách)</span></td>
+                                        <td>✅ Tạo ticket</td>
+                                        <td>❌</td>
+                                        <td>⚠️ Tự động nhận ticket của khoa/phòng</td>
+                                        <td>✅ Xử lý ticket<br>✅ Cập nhật tiến độ<br>✅ Chat/comment<br>⚠️ Request support<br>⚠️ Báo blocked</td>
+                                        <td>✅ Đánh dấu resolved<br>✅ Mô tả giải pháp</td>
+                                        <td>⚠️ Xem feedback</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-lead">Department Lead</span></td>
+                                        <td>✅ Tạo ticket</td>
+                                        <td>✅ Triage (trong phạm vi khoa/phòng)<br>⚠️ Phê duyệt reject</td>
+                                        <td>✅ Gán cho staff trong khoa/phòng<br>⚠️ Reassign trong khoa/phòng</td>
+                                        <td>⚠️ Hỗ trợ khi blocked</td>
+                                        <td>⚠️ Review tiến độ</td>
+                                        <td>✅ Review chất lượng<br>⚠️ Reopen nếu cần</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-manager">Manager/Admin</span></td>
+                                        <td>✅ Tạo ticket</td>
+                                        <td>✅ Triage<br>✅ Accept/Reject</td>
+                                        <td>✅ Gán cho bất kỳ ai<br>✅ Reassign</td>
+                                        <td>⚠️ Monitor<br>⚠️ Giải quyết blocked</td>
+                                        <td>⚠️ Review tiến độ</td>
+                                        <td>✅ Final approval<br>✅ Reopen nếu cần</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span>✅</span>
+                                <span>Được phép thực hiện</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>❌</span>
+                                <span>Không được phép</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>⚠️</span>
+                                <span>Điều kiện đặc biệt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workflow 2: Tasks -->
+                    <div id="workflow-1" class="workflow-content">
+                        <h2 style="margin-bottom: 1rem;">
+                            <i class="fas fa-tasks" style="color: var(--success-color);"></i>
+                            Workflow 2: Task Assignment & Management
+                        </h2>
+                        <p style="color: var(--gray-600); margin-bottom: 2rem;">
+                            Quy trình giao việc và quản lý tiến độ công việc, hỗ trợ 3 chiến lược giao việc khác nhau. Tasks có thể gán cho cá nhân, pool chung, hoặc khoa/phòng cụ thể.
+                        </p>
+
+                        <!-- Diagram -->
+                        <div class="workflow-diagram">
+                            <h3 style="margin-bottom: 1rem; text-align: center; color: var(--gray-700);">Sơ đồ quy trình</h3>
+                            
+                            <!-- Zoom Controls -->
+                            <div class="zoom-controls">
+                                <button class="zoom-btn" onclick="zoomDiagram('diagram-1', 'in')" title="Phóng to">
+                                    <i class="fas fa-search-plus"></i> Zoom In
+                                </button>
+                                <div class="zoom-level" id="zoom-level-1">100%</div>
+                                <button class="zoom-btn" onclick="zoomDiagram('diagram-1', 'out')" title="Thu nhỏ">
+                                    <i class="fas fa-search-minus"></i> Zoom Out
+                                </button>
+                                <button class="zoom-btn reset" onclick="zoomDiagram('diagram-1', 'reset')" title="Đặt lại">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                            </div>
+                            
+                            <div class="diagram-container" id="diagram-1">
+                                <div class="mermaid">
+flowchart LR
+    A["Manager Create Task<br/>(Manager)"] --> B[CREATED]
+    B --> C{"{Choose Strategy}<br/>(Manager)"}
+    
+    C -->|Direct| G["ASSIGNED<br/>(Manager assign)"]
+    C -->|Pool| D["POOL<br/>(System)"]
+    C -->|Department| E["DEPT_ASSIGNED<br/>(Khoa/Phong)"]
+    
+    D -->|"Staff Pick<br/>(Staff)"| G
+    E -->|"Member Pick<br/>(Staff)"| G
+    
+    G --> H["IN_PROGRESS<br/>(Staff)"]
+    H -->|"Request Support"| R["SUPPORT_REQUESTED<br/>(Staff)"]
+    R -->|"Manager approve"| S["COLLAB_ASSIGNED<br/>(+Team member)"]
+    S --> H
+    H --> I["Update Progress<br/>(Staff)"]
+    I -->|Not Done| H
+    I -->|Done| J["REVIEW<br/>(Staff submit)"]
+    
+    J --> K{"{Review}<br/>(Manager/Lead)"}
+    K -->|Approve| L["COMPLETED<br/>(System)"]
+    K -->|Changes| H
+    K -->|Reject| C
+    
+    style A fill:#e3f2fd
+    style B fill:#fff9c4
+    style G fill:#d1fae5
+    style H fill:#fef3c7
+    style R fill:#fff3cd
+    style S fill:#d1ecf1
+    style J fill:#fed7aa
+    style L fill:#66bb6a
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Steps Table -->
+                        <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Chi tiết các bước và phân quyền</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="workflow-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">Bước</th>
+                                        <th style="width: 20%;">Tên bước</th>
+                                        <th style="width: 15%;">Roles</th>
+                                        <th style="width: 40%;">Hành động</th>
+                                        <th style="width: 20%;">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>1</strong></td>
+                                        <td><strong>Task Creation</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                            <span class="role-badge role-admin">Admin</span>
+                                        </td>
+                                        <td>
+                                            • Tạo task mới<br>
+                                            • Nhập: title, description, deadline<br>
+                                            • Set priority và tags<br>
+                                            • Tạo checklist con (subtasks)
+                                        </td>
+                                        <td><span class="status-badge" style="background: #fff9c4; color: #92400e;">CREATED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2a</strong></td>
+                                        <td><strong>Direct Assignment</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                        </td>
+                                        <td>
+                                            • Chọn assignee cụ thể<br>
+                                            • System gửi notification<br>
+                                            • Task vào danh sách của assignee
+                                        </td>
+                                        <td><span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2b</strong></td>
+                                        <td><strong>Task Pool (Self-Pick)</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Task đăng lên pool công khai<br>
+                                            • Staff browse và chọn task phù hợp<br>
+                                            • Claim task (cần approval hoặc first-come-first-serve)<br>
+                                            • Manager approve → Staff nhận task
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #f8bbd0; color: #880e4f;">IN_POOL</span> →
+                                            <span class="status-badge" style="background: #e1bee7; color: #4a148c;">CLAIMED</span> →
+                                            <span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2c</strong></td>
+                                        <td><strong>Department Assignment</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                            <span class="role-badge role-lead">Department Lead</span>
+                                        </td>
+                                        <td>
+                                            • Gán cho khoa/phòng<br>
+                                            • Nhân viên trong khoa/phòng xem và tự phân chia<br>
+                                            • Member trong khoa/phòng claim task
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #c5cae9; color: #1a237e;">DEPT_ASSIGNED</span> →
+                                            <span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>3</strong></td>
+                                        <td><strong>Reassignment</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                            <span class="role-badge role-lead">Team Lead</span>
+                                        </td>
+                                        <td>
+                                            • Chọn assignee mới<br>
+                                            • Nhập lý do reassign (bắt buộc)<br>
+                                            • Thông báo cả 2 bên (old + new)<br>
+                                            • Log vào history
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #ffccbc; color: #bf360c;">REASSIGNED</span> →
+                                            <span class="status-badge" style="background: #d1fae5; color: #065f46;">ASSIGNED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4</strong></td>
+                                        <td><strong>Execution</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Bắt đầu thực hiện<br>
+                                            • Update % progress (0-100%)<br>
+                                            • Check-off subtasks đã hoàn thành<br>
+                                            • Log working hours<br>
+                                            • Chat/collaborate với khoa/phòng<br>
+                                            • <strong>Request support</strong> nếu task quá phức tạp hoặc cần thêm người<br>
+                                            • Upload files/hình ảnh kết quả<br>
+                                            • Nếu gặp khó khăn: đánh dấu BLOCKED
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #fef3c7; color: #92400e;">IN_PROGRESS</span> /
+                                            <span class="status-badge" style="background: #fff3cd; color: #856404;">SUPPORT_REQUESTED</span> /
+                                            <span class="status-badge" style="background: #fed7aa; color: #9a3412;">BLOCKED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4a</strong></td>
+                                        <td><strong>Collaboration Support</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                            <span class="role-badge role-manager">Manager</span>
+                                        </td>
+                                        <td>
+                                            • Staff request support với lý do rõ ràng<br>
+                                            • Manager review và approve request<br>
+                                            • Manager assign thêm nhân viên khoa/phòng để hỗ trợ<br>
+                                            • Cả 2 staff cùng làm việc (collaborative mode)<br>
+                                            • Workload và credit được chia đều
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #d1ecf1; color: #0c5460;">COLLAB_ASSIGNED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5</strong></td>
+                                        <td><strong>Ready for Review</strong></td>
+                                        <td>
+                                            <span class="role-badge role-staff">Staff</span>
+                                        </td>
+                                        <td>
+                                            • Hoàn thành 100% progress<br>
+                                            • Đánh dấu "Ready for Review"<br>
+                                            • Tổng hợp kết quả<br>
+                                            • Notification gửi manager
+                                        </td>
+                                        <td><span class="status-badge" style="background: #fed7aa; color: #9a3412;">REVIEW</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>6</strong></td>
+                                        <td><strong>Review & Approval</strong></td>
+                                        <td>
+                                            <span class="role-badge role-manager">Manager</span>
+                                            <span class="role-badge role-lead">Team Lead</span>
+                                        </td>
+                                        <td>
+                                            • Review kết quả thực hiện<br>
+                                            • <strong>Approve</strong> → COMPLETED<br>
+                                            • <strong>Request Changes</strong> → IN_PROGRESS (staff sửa lại)<br>
+                                            • <strong>Reject</strong> → Reassign cho người khác
+                                        </td>
+                                        <td>
+                                            <span class="status-badge" style="background: #66bb6a; color: #fff;">COMPLETED</span> /
+                                            <span class="status-badge" style="background: #ffab91; color: #bf360c;">CHANGES_REQUESTED</span> /
+                                            <span class="status-badge" style="background: #ef9a9a; color: #b71c1c;">FAILED</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>7</strong></td>
+                                        <td><strong>Completion</strong></td>
+                                        <td>
+                                            <span class="role-badge" style="background: #f3e5f5; color: #4a148c;">System</span>
+                                        </td>
+                                        <td>
+                                            • Task đóng và archive<br>
+                                            • Ghi nhận vào báo cáo<br>
+                                            • Cập nhật KPI của staff
+                                        </td>
+                                        <td><span class="status-badge" style="background: #66bb6a; color: #fff;">COMPLETED</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Assignment Strategies -->
+                        <h3 style="margin-top: 2rem; margin-bottom: 1rem;">So sánh 3 chiến lược giao việc</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="workflow-table">
+                                <thead>
+                                    <tr>
+                                        <th>Chiến lược</th>
+                                        <th>Ưu điểm</th>
+                                        <th>Nhược điểm</th>
+                                        <th>Use case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Direct Assignment</strong><br>(Giao trực tiếp)</td>
+                                        <td>
+                                            • Nhanh chóng<br>
+                                            • Kiểm soát tốt<br>
+                                            • Ensure đúng người đúng việc
+                                        </td>
+                                        <td>
+                                            • Manager phải biết capacity<br>
+                                            • Có thể overload staff
+                                        </td>
+                                        <td>
+                                            • Urgent tasks<br>
+                                            • Tasks cần chuyên môn cao<br>
+                                            • Tasks nhạy cảm
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Task Pool</strong><br>(Self-Pick)</td>
+                                        <td>
+                                            • Staff chọn theo năng lực<br>
+                                            • Tự chủ cao<br>
+                                            • Cân bằng workload tự nhiên
+                                        </td>
+                                        <td>
+                                            • Tasks khó có thể không ai nhận<br>
+                                            • Cần monitor pool thường xuyên
+                                        </td>
+                                        <td>
+                                            • Standard tasks<br>
+                                            • Flexible deadline<br>
+                                            • Multiple qualified staff
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Department Assignment</strong><br>(Giao cho khoa/phòng)</td>
+                                        <td>
+                                            • Khoa/Phòng tự phân chia linh hoạt<br>
+                                            • Share knowledge trong khoa/phòng<br>
+                                            • Collaboration tốt
+                                        </td>
+                                        <td>
+                                            • Cần Department Lead monitor<br>
+                                            • Có thể mất thời gian sắp xếp
+                                        </td>
+                                        <td>
+                                            • Department projects<br>
+                                            • Cross-functional tasks trong khoa/phòng<br>
+                                            • Training juniors
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Roles Matrix -->
+                        <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Ma trận phân quyền</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="workflow-table">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Creation</th>
+                                        <th>Assignment</th>
+                                        <th>Claim/Pick</th>
+                                        <th>Reassign</th>
+                                        <th>Execution</th>
+                                        <th>Review</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="role-badge role-user">End User</span></td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>⚠️ View own tasks<br>⚠️ Update progress</td>
+                                        <td>❌</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-staff">Staff</span></td>
+                                        <td>❌</td>
+                                        <td>❌</td>
+                                        <td>✅ Pick from pool<br>✅ Claim task</td>
+                                        <td>❌</td>
+                                        <td>
+                                            ✅ Update progress<br>
+                                            ✅ Check subtasks<br>
+                                            ✅ Log hours<br>
+                                            ✅ Chat/collaborate<br>
+                                            ✅ Upload files<br>
+                                            ✅ Submit for review
+                                        </td>
+                                        <td>⚠️ View feedback</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-lead">Department Lead</span></td>
+                                        <td>⚠️ Create department tasks</td>
+                                        <td>✅ Assign to department<br>⚠️ Reassign department tasks</td>
+                                        <td>⚠️ Approve claims</td>
+                                        <td>✅ Reassign department tasks</td>
+                                        <td>⚠️ Monitor department<br>⚠️ Unblock issues</td>
+                                        <td>✅ Review department tasks<br>✅ Approve/Request changes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="role-badge role-manager">Manager/Admin</span></td>
+                                        <td>✅ Create all tasks<br>✅ Set priorities<br>✅ Define subtasks</td>
+                                        <td>✅ Assign to anyone<br>✅ Department assignment<br>✅ Pool assignment</td>
+                                        <td>✅ Approve all claims</td>
+                                        <td>✅ Reassign any task</td>
+                                        <td>⚠️ Monitor all<br>✅ Resolve blocked<br>⚠️ View reports</td>
+                                        <td>✅ Review any task<br>✅ Final approval<br>✅ Reject and reassign</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span>✅</span>
+                                <span>Được phép thực hiện</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>❌</span>
+                                <span>Không được phép</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>⚠️</span>
+                                <span>Giới hạn phạm vi hoặc điều kiện đặc biệt</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Tracking -->
+                        <div style="background: #e0f2f1; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #00897b; margin-top: 2rem;">
+                            <h4 style="margin-bottom: 1rem; color: #004d40;">
+                                <i class="fas fa-chart-line"></i>
+                                Theo dõi tiến độ
+                            </h4>
+                            <p style="color: #00695c; margin-bottom: 1rem;">
+                                Hệ thống tracking tiến độ đa chiều:
+                            </p>
+                            <ul style="color: #00695c; line-height: 1.8; padding-left: 1.5rem;">
+                                <li><strong>Progress Percentage:</strong> Staff tự cập nhật (0-100%)</li>
+                                <li><strong>Subtasks Completion:</strong> Check-off từng item trong checklist</li>
+                                <li><strong>Time Logs:</strong> Ghi nhận giờ làm thực tế</li>
+                                <li><strong>Comments/Updates:</strong> Chat thread để báo cáo tiến độ</li>
+                                <li><strong>File Attachments:</strong> Upload kết quả trung gian</li>
+                            </ul>
+                            <p style="margin-top: 1rem; color: #00695c; font-size: 0.875rem;">
+                                ℹ️ System tự động nhắc nhở nếu không có update > 4 giờ.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1.5rem;">
+                        <i class="fas fa-balance-scale" style="color: var(--info-color);"></i>
+                        So sánh 2 Workflows
+                    </h2>
+                    <div style="overflow-x: auto;">
+                        <table class="workflow-table">
+                            <thead>
+                                <tr>
+                                    <th>Tiêu chí</th>
+                                    <th>Support Tickets</th>
+                                    <th>Tasks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Mục đích</strong></td>
+                                    <td>Giải quyết vấn đề, hỗ trợ khẩn cấp</td>
+                                    <td>Thực hiện công việc theo kế hoạch</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Người khởi tạo</strong></td>
+                                    <td>End User, Staff, Manager</td>
+                                    <td>Manager, Admin</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ai thực hiện</strong></td>
+                                    <td>Staff (được assign bởi Manager)</td>
+                                    <td>Staff (assign hoặc self-pick)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SLA tracking</strong></td>
+                                    <td>✅ <strong>Strict SLA</strong> theo priority<br>(Critical: 2h, High: 4h, etc.)</td>
+                                    <td>⚠️ Deadline-based, không strict SLA</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Approval process</strong></td>
+                                    <td>Manager/User review sau resolved</td>
+                                    <td>Manager review sau completion</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reassignment</strong></td>
+                                    <td>Manager decision, cần lý do rõ ràng</td>
+                                    <td>Manager/Lead decision, flexible hơn</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phản hồi cuối</strong></td>
+                                    <td>User rate 1-5 sao</td>
+                                    <td>Manager approve/reject/request changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Escalation</strong></td>
+                                    <td>✅ Auto-escalate khi breach SLA</td>
+                                    <td>⚠️ Manual escalate khi blocked lâu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1.5rem;">
+                        <i class="fas fa-lightbulb" style="color: var(--warning-color);"></i>
+                        Best Practices
+                    </h2>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <!-- For End Users -->
+                        <div style="background: #fef3c7; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <h4 style="margin-bottom: 1rem; color: #92400e;">
+                                <span class="role-badge role-user">Cho End Users</span>
+                            </h4>
+                            <ul style="color: #78350f; line-height: 1.8; padding-left: 1.5rem;">
+                                <li><strong>Tạo ticket rõ ràng:</strong> Tiêu đề ngắn gọn, mô tả chi tiết vấn đề</li>
+                                <li><strong>Chọn priority đúng:</strong> Critical chỉ dành cho cấp cứu, hệ thống sập</li>
+                                <li><strong>Đính kèm hình ảnh:</strong> Screenshot hoặc ảnh chụp giúp staff hiểu nhanh hơn</li>
+                                <li><strong>Theo dõi thường xuyên:</strong> Check status và reply comment kịp thời</li>
+                            </ul>
+                        </div>
+
+                        <!-- For Staff -->
+                        <div style="background: #d1fae5; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #10b981;">
+                            <h4 style="margin-bottom: 1rem; color: #065f46;">
+                                <span class="role-badge role-staff">Cho Staff</span>
+                            </h4>
+                            <ul style="color: #064e3b; line-height: 1.8; padding-left: 1.5rem;">
+                                <li><strong>Update tiến độ thường xuyên:</strong> Ít nhất 1 lần/4h cho tasks đang làm</li>
+                                <li><strong>Communicate proactively:</strong> Báo sớm khi gặp vướng mắc</li>
+                                <li><strong>Log hours accurately:</strong> Ghi nhận giờ làm chính xác cho reporting</li>
+                                <li><strong>Check subtasks:</strong> Đánh dấu hoàn thành từng phần để manager track được</li>
+                            </ul>
+                        </div>
+
+                        <!-- For Managers/Leads -->
+                        <div style="background: #dbeafe; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            <h4 style="margin-bottom: 1rem; color: #1e40af;">
+                                <span class="role-badge role-manager">Cho Managers/Leads</span>
+                            </h4>
+                            <ul style="color: #1e3a8a; line-height: 1.8; padding-left: 1.5rem;">
+                                <li><strong>Triage nhanh:</strong> Respond ticket trong SLA time</li>
+                                <li><strong>Assign phù hợp:</strong> Cân nhắc workload và skill của staff</li>
+                                <li><strong>Monitor proactively:</strong> Theo dõi dashboard, không chờ escalation</li>
+                                <li><strong>Review công bằng:</strong> Đánh giá dựa trên kết quả, không bias</li>
+                                <li><strong>Document decisions:</strong> Ghi rõ lý do khi reject/reassign</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Link -->
+                <div class="card" style="margin-top: 2rem; text-align: center; background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);">
+                    <h3 style="color: #00695c; margin-bottom: 1rem;">
+                        <i class="fas fa-download"></i>
+                        Tài liệu chi tiết
+                    </h3>
+                    <p style="color: #004d40; margin-bottom: 1.5rem;">
+                        Tải xuống tài liệu phân tích workflows đầy đủ với metrics, KPIs và exception handling.
+                    </p>
+                    <a href="../docs/WORKFLOW_ANALYSIS.md" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-file-download"></i>
+                        Tải WORKFLOW_ANALYSIS.md
+                    </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof mermaid !== 'undefined') {
+                // Config
+                mermaid.initialize({ 
+                    startOnLoad: false,
+                    theme: 'default',
+                    flowchart: {
+                        useMaxWidth: true,
+                        htmlLabels: true,
+                        curve: 'basis'
+                    }
+                });
+                
+                // Render all diagrams (even hidden ones)
+                setTimeout(() => {
+                    const diagrams = document.querySelectorAll('.mermaid');
+                    diagrams.forEach((element, index) => {
+                        try {
+                            const id = `mermaid-diagram-${index}`;
+                            const code = element.textContent;
+                            element.removeAttribute('data-processed');
+                            mermaid.render(id, code).then(result => {
+                                element.innerHTML = result.svg;
+                            }).catch(err => {
+                                console.error('Mermaid error:', err);
+                                element.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+                            });
+                        } catch (e) {
+                            console.error('Mermaid render error:', e);
+                            element.innerHTML = '<p style="color:red;">Error rendering diagram</p>';
+                        }
+                    });
+                }, 100);
+            } else {
+                console.error('Mermaid library not loaded');
+            }
+        });
+
+        // Workflow tabs switching
+        function showWorkflow(index) {
+            // Hide all workflows and tabs
+            document.querySelectorAll('.workflow-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.workflow-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected workflow and tab
+            document.getElementById(`workflow-${index}`).classList.add('active');
+            document.querySelectorAll('.workflow-tab')[index].classList.add('active');
+        }
+        
+        // Zoom functionality for diagrams
+        const zoomLevels = {
+            'diagram-0': 1.0,
+            'diagram-1': 1.0
+        };
+        
+        function zoomDiagram(diagramId, action) {
+            const container = document.getElementById(diagramId);
+            const levelDisplay = document.getElementById(`zoom-level-${diagramId.split('-')[1]}`);
+            
+            if (!container || !levelDisplay) return;
+            
+            const step = 0.1;
+            const minZoom = 0.5;
+            const maxZoom = 2.0;
+            
+            let currentZoom = zoomLevels[diagramId];
+            
+            switch(action) {
+                case 'in':
+                    currentZoom = Math.min(maxZoom, currentZoom + step);
+                    break;
+                case 'out':
+                    currentZoom = Math.max(minZoom, currentZoom - step);
+                    break;
+                case 'reset':
+                    currentZoom = 1.0;
+                    break;
+            }
+            
+            zoomLevels[diagramId] = currentZoom;
+            container.style.transform = `scale(${currentZoom})`;
+            levelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - QLCV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hospital"></i>
+                    <span>QLCV</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Chính</div>
+                    <a href="dashboard-manager.html" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Bảng điều khiển</span>
+                    </a>
+                    <a href="tickets-list.html" class="nav-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Phiếu yêu cầu</span>
+                    </a>
+                    <a href="tasks-list.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Công việc</span>
+                    </a>
+                    <a href="task-pool.html" class="nav-item">
+                        <i class="fas fa-swimming-pool"></i>
+                        <span>Công việc chờ nhận</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Quản Lý</div>
+                    <a href="reports.html" class="nav-item active">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Báo cáo</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Người dùng</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Hệ Thống</div>
+                    <a href="settings.html" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài đặt</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">MN</div>
+                    <div class="user-details">
+                        <div class="user-name">Manager</div>
+                        <div class="user-role">Manager</div>
+                    </div>
+                </div>
+                <a href="login.html" style="color: var(--gray-500); margin-left: auto;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Page Header -->
+                <div class="page-header">
+                <div>
+                    <h1 class="page-title">Báo Cáo & Phân Tích</h1>
+                    <p class="page-description">Thống kê và phân tích hiệu suất làm việc</p>
+                </div>
+                <div class="page-header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export All
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-calendar-alt"></i> Date Range
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label class="form-label">Khoảng thời gian</label>
+                            <select class="form-control">
+                                <option>7 ngày qua</option>
+                                <option>30 ngày qua</option>
+                                <option selected>Tháng này</option>
+                                <option>Quý này</option>
+                                <option>Năm này</option>
+                                <option>Tùy chỉnh</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Phòng ban</label>
+                            <select class="form-control">
+                                <option selected>Tất cả</option>
+                                <option>Cấp cứu</option>
+                                <option>Ngoại khoa</option>
+                                <option>Nội khoa</option>
+                                <option>Hỗ trợ IT</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Team</label>
+                            <select class="form-control">
+                                <option selected>Tất cả teams</option>
+                                <option>Team A</option>
+                                <option>Team B</option>
+                                <option>Team C</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-filter"></i> Áp dụng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Categories -->
+            <div class="tabs tabs-underline" style="margin-bottom: 1.5rem; background: white; padding: 0; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <button class="tab-btn active" onclick="showReportCategory('performance')">
+                    <i class="fas fa-chart-line"></i> Hiệu suất
+                </button>
+                <button class="tab-btn" onclick="showReportCategory('compliance')">
+                    <i class="fas fa-check-circle"></i> Tuân thủ
+                </button>
+                <button class="tab-btn" onclick="showReportCategory('workload')">
+                    <i class="fas fa-tasks"></i> Khối lượng công việc
+                </button>
+                <button class="tab-btn" onclick="showReportCategory('quality')">
+                    <i class="fas fa-star"></i> Chất lượng
+                </button>
+            </div>
+
+            <!-- Performance Reports -->
+            <div id="category-performance" class="report-category active">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">
+                    <i class="fas fa-chart-line"></i> Báo Cáo Hiệu Suất
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Ticket Performance -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-ticket-alt"></i>
+                                Hiệu Suất Phiếu Yêu Cầu
+                            </h3>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--blue-500), var(--blue-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Tổng tickets</div>
+                                    <div style="font-size: 2rem; font-weight: 700;">248</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--green-500), var(--green-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Đã giải quyết</div>
+                                    <div style="font-size: 2rem; font-weight: 700;">215</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--yellow-500), var(--yellow-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Thời gian TB</div>
+                                    <div style="font-size: 1.5rem; font-weight: 700;">4.2h</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--purple-500), var(--purple-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Tỷ lệ đạt</div>
+                                    <div style="font-size: 1.5rem; font-weight: 700;">86.7%</div>
+                                </div>
+                            </div>
+                            <canvas id="ticketPerformanceChart" height="180"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Task Completion -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-check-square"></i>
+                                Hoàn Thành Công Việc
+                            </h3>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--indigo-500), var(--indigo-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Tổng tasks</div>
+                                    <div style="font-size: 2rem; font-weight: 700;">156</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--green-500), var(--green-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Hoàn thành</div>
+                                    <div style="font-size: 2rem; font-weight: 700;">142</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--red-500), var(--red-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Quá hạn</div>
+                                    <div style="font-size: 1.5rem; font-weight: 700;">8</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--teal-500), var(--teal-600)); color: white; padding: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.25rem;">Tỷ lệ đúng hạn</div>
+                                    <div style="font-size: 1.5rem; font-weight: 700;">91%</div>
+                                </div>
+                            </div>
+                            <canvas id="taskCompletionChart" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Performance -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-users"></i>
+                            Hiệu Suất Nhóm
+                        </h3>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="teamPerformanceChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Reports -->
+            <div id="category-compliance" class="report-category">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">
+                    <i class="fas fa-check-circle"></i> Báo Cáo Tuân Thủ SLA
+                </h2>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- SLA Compliance Trend -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-area"></i>
+                                SLA Compliance Trend
+                            </h3>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="slaComplianceChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- SLA by Priority -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                SLA by Priority
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="slaPriorityChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLA Breach Details -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            SLA Breach Details
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Ticket ID</th>
+                                        <th>Tiêu đề</th>
+                                        <th>Ưu tiên</th>
+                                        <th>Người xử lý</th>
+                                        <th>SLA Target</th>
+                                        <th>Actual Time</th>
+                                        <th>Breach Time</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>#TKT-001</strong></td>
+                                        <td>Máy in không hoạt động</td>
+                                        <td><span class="badge badge-priority-critical">KHẨN CẤP</span></td>
+                                        <td>Linh Dinh</td>
+                                        <td>1 giờ</td>
+                                        <td>1.5 giờ</td>
+                                        <td><span style="color: var(--danger-color); font-weight: 600;">+30 phút</span></td>
+                                        <td><span class="badge badge-status-resolved">ĐÃ GIẢI QUYẾT</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#TKT-015</strong></td>
+                                        <td>Reset password</td>
+                                        <td><span class="badge badge-priority-high">CAO</span></td>
+                                        <td>Jane Smith</td>
+                                        <td>4 giờ</td>
+                                        <td>5 giờ</td>
+                                        <td><span style="color: var(--danger-color); font-weight: 600;">+1 giờ</span></td>
+                                        <td><span class="badge badge-status-resolved">ĐÃ GIẢI QUYẾT</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#TKT-023</strong></td>
+                                        <td>Cập nhật phần mềm</td>
+                                        <td><span class="badge badge-priority-medium">TRUNG BÌNH</span></td>
+                                        <td>Bob Wilson</td>
+                                        <td>8 giờ</td>
+                                        <td>9.5 giờ</td>
+                                        <td><span style="color: var(--danger-color); font-weight: 600;">+1.5 giờ</span></td>
+                                        <td><span class="badge badge-status-resolved">ĐÃ GIẢI QUYẾT</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workload Reports -->
+            <div id="category-workload" class="report-category">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">
+                    <i class="fas fa-tasks"></i> Phân Bố Khối Lượng Công Việc
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Current Workload -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-briefcase"></i>
+                                Current Workload
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--blue-500);">JD</div>
+                                        <span style="font-weight: 600; font-size: 0.875rem;">Linh Dinh</span>
+                                    </div>
+                                    <span class="badge" style="background: var(--blue-100); color: var(--blue-700); font-weight: 700;">12</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--green-500);">JS</div>
+                                        <span style="font-weight: 600; font-size: 0.875rem;">Jane Smith</span>
+                                    </div>
+                                    <span class="badge" style="background: var(--green-100); color: var(--green-700); font-weight: 700;">8</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--purple-500);">BW</div>
+                                        <span style="font-weight: 600; font-size: 0.875rem;">Bob Wilson</span>
+                                    </div>
+                                    <span class="badge" style="background: var(--purple-100); color: var(--purple-700); font-weight: 700;">15</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--orange-500);">AM</div>
+                                        <span style="font-weight: 600; font-size: 0.875rem;">Alice Miller</span>
+                                    </div>
+                                    <span class="badge" style="background: var(--orange-100); color: var(--orange-700); font-weight: 700;">6</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capacity Utilization -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Capacity Utilization
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="capacityChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Backlog Analysis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-layer-group"></i>
+                                Backlog Analysis
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 3rem; font-weight: 700; color: var(--primary-color);">45</div>
+                                    <div style="color: var(--gray-600); margin-top: 0.25rem;">Tổng backlog items</div>
+                                </div>
+                                <div style="height: 1px; background: var(--border-color);"></div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger-color);">12</div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem;">Critical</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning-color);">18</div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem;">High</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">15</div>
+                                        <div style="color: var(--gray-600); font-size: 0.875rem;">Medium</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Reports -->
+            <div id="category-quality" class="report-category">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">
+                    <i class="fas fa-star"></i> Chỉ Số Chất Lượng
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                    <!-- User Satisfaction -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-smile"></i>
+                                User Satisfaction
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <div style="font-size: 4rem; font-weight: 700; color: var(--success-color);">4.6</div>
+                                <div style="color: var(--gray-600); margin-top: 0.5rem;">
+                                    <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                    <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                    <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                    <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                    <i class="fas fa-star-half-alt" style="color: var(--warning-color);"></i>
+                                </div>
+                                <div style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.5rem;">Based on 248 ratings</div>
+                            </div>
+                            <canvas id="satisfactionChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- First Time Fix Rate -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-check-double"></i>
+                                First Time Fix Rate
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--green-500), var(--green-600)); color: white; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Fixed First Time</div>
+                                    <div style="font-size: 2.5rem; font-weight: 700;">78%</div>
+                                </div>
+                                <div class="stat-card" style="background: linear-gradient(135deg, var(--orange-500), var(--orange-600)); color: white; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+                                    <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Tỉ lệ mở lại</div>
+                                    <div style="font-size: 2.5rem; font-weight: 700;">12%</div>
+                                </div>
+                            </div>
+                            <canvas id="fixRateChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching
+        function showReportCategory(category) {
+            // Hide all categories
+            document.querySelectorAll('.report-category').forEach(cat => {
+                cat.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected category
+            const categoryElement = document.getElementById(`category-${category}`);
+            if (categoryElement) {
+                categoryElement.classList.add('active');
+            }
+            
+            // Activate clicked button
+            if (window.event && window.event.target) {
+                const clickedBtn = window.event.target.closest('.tab-btn');
+                if (clickedBtn) {
+                    clickedBtn.classList.add('active');
+                }
+            }
+        }
+
+        // Initialize charts after DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Ticket Performance Chart
+            const ticketPerfCtx = document.getElementById('ticketPerformanceChart');
+            if (ticketPerfCtx) {
+                new Chart(ticketPerfCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Phiếu Yêu Cầu ĐÃ XỬ LÝ',
+                            data: [45, 52, 61, 57],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Task Completion Chart
+            const taskCompCtx = document.getElementById('taskCompletionChart');
+            if (taskCompCtx) {
+                new Chart(taskCompCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Completed',
+                            data: [32, 38, 35, 37],
+                            backgroundColor: '#10b981'
+                        }, {
+                            label: 'Overdue',
+                            data: [3, 2, 1, 2],
+                            backgroundColor: '#ef4444'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            // Team Performance Chart
+            const teamPerfCtx = document.getElementById('teamPerformanceChart');
+            if (teamPerfCtx) {
+                new Chart(teamPerfCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Linh Dinh', 'Jane Smith', 'Bob Wilson', 'Alice Miller', 'Tom Brown'],
+                        datasets: [{
+                            label: 'Phiếu Yêu Cầu ĐÃ XỬ LÝ',
+                            data: [45, 38, 52, 31, 42],
+                            backgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // SLA Compliance Chart
+            const slaCompCtx = document.getElementById('slaComplianceChart');
+            if (slaCompCtx) {
+                new Chart(slaCompCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'SLA Compliance %',
+                            data: [85, 87, 91, 89, 92, 88],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 80,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // SLA Priority Chart
+            const slaPriorityCtx = document.getElementById('slaPriorityChart');
+            if (slaPriorityCtx) {
+                new Chart(slaPriorityCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Critical', 'High', 'Medium', 'Low'],
+                        datasets: [{
+                            data: [92, 88, 95, 97],
+                            backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            // Capacity Chart
+            const capacityCtx = document.getElementById('capacityChart');
+            if (capacityCtx) {
+                new Chart(capacityCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Utilized', 'Available'],
+                        datasets: [{
+                            data: [68, 32],
+                            backgroundColor: ['#2563eb', '#e5e7eb']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Satisfaction Chart
+            const satisfactionCtx = document.getElementById('satisfactionChart');
+            if (satisfactionCtx) {
+                new Chart(satisfactionCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['5★', '4★', '3★', '2★', '1★'],
+                        datasets: [{
+                            label: 'Ratings',
+                            data: [145, 78, 18, 5, 2],
+                            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Fix Rate Chart
+            const fixRateCtx = document.getElementById('fixRateChart');
+            if (fixRateCtx) {
+                new Chart(fixRateCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'First Time Fix %',
+                            data: [72, 75, 78, 76, 79, 78],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
